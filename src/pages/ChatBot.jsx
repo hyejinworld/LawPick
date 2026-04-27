@@ -95,12 +95,12 @@ export default function ChatBot() {
     const newMessages = [...messages, { role: "user", content: userText }];
     setMessages(newMessages);
     setLoading(true);
-    setLawStatus("📚 법제처에서 관련 법령을 검색 중...");
+    setLawStatus("📚 법제처에서 관련 법령을 검색 중입니다...");
 
     try {
       // 1. 법제처 API 호출
       const lawContext = await fetchLawContext(userText);
-      setLawStatus("🤖 AI가 답변을 작성 중...");
+      setLawStatus("⚖️ AI가 답변을 작성 중입니다...");
 
       // 2. Gemini API에 법령 컨텍스트 포함해서 요청
       const systemPrompt = `당신은 Lawpick의 AI 법률 상담 봇입니다. 한국 법률 전문가로서 의뢰인에게 친절하고 명확하게 법률 정보를 제공합니다.
@@ -160,7 +160,7 @@ ${lawContext ? `아래는 법제처 국가법령정보센터에서 검색된 관
     }}>
       <div style={{ marginBottom: "1.5rem", flexShrink: 0 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "#111827", marginBottom: 4 }}>
-          🤖 AI 법률 상담
+          ⚖️ AI 법률 상담
         </h1>
         <p style={{ fontSize: 13, color: "#9ca3af" }}>
           법제처 국가법령정보 기반 · 24시간 무료 상담
