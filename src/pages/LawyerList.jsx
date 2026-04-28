@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LAWYERS, REGIONS, SPECS } from "../data/lawyers";
+import { useFavorites } from "../hooks/useFavorites";
 
 function LawyerCard({ lawyer, isFav, onToggleFav }) {
   const [hovered, setHovered] = useState(false);
@@ -100,7 +101,7 @@ export default function LawyerList() {
   const [region, setRegion] = useState("전체");
   const [spec, setSpec] = useState(initialSpec);
   const [sort, setSort] = useState("rating");
-  const [favorites, setFavorites] = useState(new Set());
+  const { favorites, toggleFav } = useFavorites();
 
   useEffect(() => {
     const p = new URLSearchParams(location.search);
@@ -120,14 +121,6 @@ export default function LawyerList() {
     if (sort === "exp") list = [...list].sort((a, b) => parseInt(b.exp) - parseInt(a.exp));
     return list;
   }, [query, region, spec, sort]);
-
-  const toggleFav = (id) => {
-    setFavorites(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
 
   const FilterBtn = ({ label, active, onClick }) => (
     <button onClick={onClick} style={{

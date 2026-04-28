@@ -224,7 +224,17 @@ export default function MainPage() {
           Law<span style={{ color: "#111827" }}>pick</span>
         </div>
         <p style={{ fontSize: 13, color: "#9ca3af" }}>
-          © 2024 Lawpick. AI 법률 서비스 플랫폼. 법적 효력이 있는 정식 법률 자문은 담당 변호사에게 문의하세요.
+          © 2026 Lawpick. AI 법률 서비스 플랫폼. 법적 효력이 있는 정식 법률 자문은 담당 변호사에게 문의하세요.
+          E-mail : lawpick.law.0612@gmail.com
+          개인정보보호책임자: 오혜진
+          통신판매업신고: 2026-경기도성남시분당구-1234号
+          사업자등록번호: 123-45-67890
+          사업장소재지: 경기도 성남시 분당구 정자동 123
+          대표자: 오혜진
+          고객센터: 1234-5678
+          팩스: 031-1234-5678
+          COPYRIGHT ⓒ 2026 Lawpick ALL RIGHTS RESERVED.
+
         </p>
       </footer>
     </div>

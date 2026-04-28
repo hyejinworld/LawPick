@@ -1,7 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
   const { pathname } = useLocation();
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("로그아웃 실패", error);
+    }
+  }
 
   const links = [
     { to: "/lawyers", label: "변호사" },
@@ -53,21 +65,73 @@ export default function Navbar() {
         </nav>
 
         {/* 우측 버튼 */}
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link
-            to="/chat"
-            style={{
-              padding: "7px 18px",
-              background: "#1d4ed8",
-              color: "#fff",
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
-          >
-            마이페이지
-          </Link>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {currentUser ? (
+            <>
+              <span style={{ fontSize: 14, color: "#4b5563" }}>
+                <strong style={{ color: "#111827" }}>{currentUser.email}</strong>님
+              </span>
+              <Link
+                to="/mypage"
+                style={{
+                  padding: "6px 14px",
+                  background: "#1d4ed8",
+                  color: "#fff",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                마이페이지
+              </Link>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "6px 14px",
+                  background: "#fff",
+                  color: "#ef4444",
+                  border: "1px solid #fee2e2",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                style={{
+                  padding: "6px 14px",
+                  color: "#374151",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                로그인
+              </Link>
+              <Link
+                to="/signup"
+                style={{
+                  padding: "7px 18px",
+                  background: "#1d4ed8",
+                  color: "#fff",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                회원가입
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
