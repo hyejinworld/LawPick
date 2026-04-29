@@ -1,11 +1,62 @@
 import { useParams, Link } from "react-router-dom";
 import { LAWYERS } from "../data/lawyers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useReviews } from "../hooks/useReviews";
 
 export default function LawyerDetail() {
   const { id } = useParams();
   const lawyer = LAWYERS.find(l => l.id === Number(id));
   const [isFav, setIsFav] = useState(false);
+
+  const { currentUser } = useAuth();
+  const { getLawyerReviews, addReview, deleteReview } = useReviews();
+  const [reviews, setReviews] = useState([]);
+  
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 컴포넌트 마운트 시 리뷰 불러오기
+  useEffect(() => {
+    if (lawyer) {
+      getLawyerReviews(lawyer.id).then(setReviews);
+    }
+  }, [lawyer]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!currentUser) return alert("리뷰를 작성하려면 로그인이 필요합니다.");
+    if (!content.trim()) return alert("리뷰 내용을 입력해주세요.");
+
+    setIsSubmitting(true);
+    try {
+      await addReview(lawyer.id, rating, content);
+      alert("리뷰가 성공적으로 작성되었습니다!");
+      // 리뷰 폼 닫기 및 초기화
+      setShowReviewForm(false);
+      setContent("");
+      setRating(5);
+      // 최신 리뷰 다시 불러오기
+      getLawyerReviews(lawyer.id).then(setReviews);
+    } catch (e) {
+      alert("리뷰 작성 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm("정말로 이 리뷰를 삭제하시겠습니까?")) return;
+    try {
+      await deleteReview(reviewId);
+      // 최신 리뷰 다시 불러오기
+      getLawyerReviews(lawyer.id).then(setReviews);
+    } catch (e) {
+      alert("리뷰 삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   if (!lawyer) {
     return (
@@ -162,14 +213,102 @@ export default function LawyerDetail() {
             </button>
           </Link>
 
-          <button style={{
-            width: "100%", padding: "12px", background: "#fff", color: "#1d4ed8",
-            border: "1px solid #1d4ed8", borderRadius: 10, fontSize: 14, fontWeight: 600,
-            cursor: "pointer", fontFamily: "inherit",
-          }}>
-            ⭐ 리뷰 작성
+          <button 
+            onClick={() => {
+              if (!currentUser) {
+                alert("리뷰를 작성하려면 로그인이 필요합니다.");
+              } else {
+                setShowReviewForm(!showReviewForm);
+              }
+            }}
+            style={{
+              width: "100%", padding: "12px", background: "#fff", color: "#1d4ed8",
+              border: "1px solid #1d4ed8", borderRadius: 10, fontSize: 14, fontWeight: 600,
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            {showReviewForm ? "취소" : "⭐ 리뷰 작성"}
           </button>
         </div>
+      </div>
+
+      {/* 리뷰 작성 폼 */}
+      {showReviewForm && (
+        <div style={{ background: "#fff", border: "1px solid #1d4ed8", borderRadius: 14, padding: "1.5rem", marginBottom: "2rem", marginTop: "1rem" }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>리뷰 작성하기</h3>
+          <form onSubmit={handleSubmitReview} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 600 }}>별점</span>
+              <select value={rating} onChange={e => setRating(Number(e.target.value))} style={{ padding: "6px", borderRadius: 6, border: "1px solid #e5e7eb" }}>
+                <option value={5}>⭐⭐⭐⭐⭐ (5점)</option>
+                <option value={4}>⭐⭐⭐⭐ (4점)</option>
+                <option value={3}>⭐⭐⭐ (3점)</option>
+                <option value={2}>⭐⭐ (2점)</option>
+                <option value={1}>⭐ (1점)</option>
+              </select>
+            </div>
+            <textarea
+              placeholder="상담 후기나 변호사에 대한 평가를 솔직하게 남겨주세요."
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              rows={4}
+              style={{ padding: "10px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14, fontFamily: "inherit", resize: "vertical" }}
+            />
+            <button
+              disabled={isSubmitting}
+              type="submit"
+              style={{
+                alignSelf: "flex-end", padding: "8px 20px", background: "#1d4ed8", color: "#fff",
+                border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: isSubmitting ? "not-allowed" : "pointer",
+                opacity: isSubmitting ? 0.7 : 1
+              }}
+            >
+              {isSubmitting ? "등록 중..." : "리뷰 등록"}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* 리뷰 목록 */}
+      <div style={{ marginTop: 32, marginBottom: 40 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#111827", marginBottom: 16 }}>의뢰인 리얼 후기 ({reviews.length})</h2>
+        {reviews.length === 0 ? (
+          <div style={{ background: "#f9fafb", padding: "3rem", textAlign: "center", borderRadius: 12, color: "#6b7280" }}>
+            아직 작성된 리뷰가 없습니다. 첫 리뷰를 남겨보세요!
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {reviews.map(review => (
+              <div key={review.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: "1.2rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+                      {review.userEmail.split("@")[0]}***
+                    </span>
+                    <span style={{ color: "#f59e0b", fontSize: 13 }}>{"★".repeat(review.rating)}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 12, color: "#9ca3af" }}>
+                      {review.createdAt ? new Date(review.createdAt.toMillis()).toLocaleDateString() : '방금 전'}
+                    </span>
+                    {currentUser?.uid === review.userId && (
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        style={{
+                          background: "none", border: "none", color: "#ef4444", fontSize: 12,
+                          cursor: "pointer", padding: 0, textDecoration: "underline"
+                        }}
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p style={{ fontSize: 14, color: "#374151", margin: 0, lineHeight: 1.6 }}>{review.content}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 다른 변호사 */}

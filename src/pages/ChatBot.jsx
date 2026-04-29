@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useChatHistory } from "../hooks/useChatHistory";
 
 const QUICK_QUESTIONS = [
   "임대차 계약 시 주의사항이 궁금해요",
@@ -83,9 +84,16 @@ export default function ChatBot() {
   const [lawStatus, setLawStatus] = useState(""); // 법령 검색 상태 표시
   const bottomRef = useRef(null);
 
+  const { saveSession } = useChatHistory();
+  const [sessionId] = useState(Date.now()); // 현재 채팅방 고유 ID
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, lawStatus]);
+    // 메시지가 업데이트 될 때마다 세션 저장
+    if (messages.length > 1) {
+      saveSession(sessionId, messages);
+    }
+  }, [messages, lawStatus, sessionId, saveSession]);
 
   const sendMessage = async (text) => {
     const userText = text || input.trim();

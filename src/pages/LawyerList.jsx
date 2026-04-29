@@ -25,6 +25,7 @@ function LawyerCard({ lawyer, isFav, onToggleFav }) {
           width: 32, height: 32, borderRadius: "50%",
           border: `1px solid ${isFav ? "#ef4444" : "#e5e7eb"}`,
           background: isFav ? "#fef2f2" : "#f9fafb",
+          color: isFav ? "#ef4444" : "#9ca3af",
           display: "flex", alignItems: "center", justifyContent: "center",
           cursor: "pointer", fontSize: 16, lineHeight: 1, transition: "all 0.15s",
         }}
@@ -118,7 +119,10 @@ export default function LawyerList() {
     });
     if (sort === "rating") list = [...list].sort((a, b) => b.rating - a.rating);
     if (sort === "reviews") list = [...list].sort((a, b) => b.reviews - a.reviews);
-    if (sort === "exp") list = [...list].sort((a, b) => parseInt(b.exp) - parseInt(a.exp));
+    if (sort === "exp") {
+      const getExp = (str) => parseInt(str.replace(/[^0-9]/g, "")) || 0;
+      list = [...list].sort((a, b) => getExp(b.exp) - getExp(a.exp));
+    }
     return list;
   }, [query, region, spec, sort]);
 
