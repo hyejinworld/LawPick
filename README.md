@@ -26,30 +26,48 @@ Lawpick은 복잡한 법률 문제로 고민하는 사용자들이 자신에게 
 * **Styling:** CSS3
 * **API:** 법제처 오픈 API (Open Data)
 
+
 ## 📂 Project Structure
 
 ```text
-lawpick/
-├── node_modules/       # 외부 라이브러리 폴더 (Git 제외)
-├── src/
-│   ├── components/     # 재사용 가능한 컴포넌트
-│   │   └── Navbar.jsx
-│   ├── data/           # 정적 데이터 관리
-│   │   └── lawyers.js
-│   ├── image/          # 프로젝트 내부 이미지 리소스
-│   ├── pages/          # 페이지 단위 컴포넌트
-│   │   ├── ChatBot.jsx
-│   │   ├── LawyerDetail.jsx
-│   │   ├── LawyerList.jsx
-│   │   ├── MainPage.jsx
-│   │   └── NewsPage.jsx
-│   ├── App.jsx         # 메인 어플리케이션 로직
-│   ├── index.css       # 글로벌 스타일시트
-│   └── main.jsx        # 엔트리 포인트 (ReactDOM 랜더링)
-├── generate_lawyers.js # 데이터 생성 스크립트
-├── index.html          # 메인 HTML 파일
-├── lawyers.jpg         # 프로젝트 관련 이미지
-├── package-lock.json   # 의존성 잠금 파일
-├── package.json        # 프로젝트 정보 및 종속성 관리
-├── split_image.js      # 이미지 처리 관련 스크립트
-└── vite.config.js      # Vite 설정 파일
+📁 lawpick/ (프로젝트 루트)
+├── 📁 .firebase/             # Firebase 배포 및 호스팅 관련 설정 폴더
+├── 📁 public/                # 정적 파일 (favicon 등)
+├── 📁 src/                   # 💡 핵심 소스 코드 폴더
+│   ├── 📁 components/        # 공통으로 사용되는 UI 컴포넌트
+│   │   └── Navbar.jsx        # 상단 네비게이션 바
+│   │
+│   ├── 📁 contexts/          # 전역 상태 관리 (React Context)
+│   │   └── AuthContext.jsx   # 로그인/회원가입 등 인증 상태 관리
+│   │
+│   ├── 📁 data/              # 프론트엔드 정적 데이터
+│   │   └── lawyers.js        # 초기 변호사 데이터 리스트 및 이미지 정보
+│   │
+│   ├── 📁 hooks/             # 재사용 가능한 로직 (Custom Hooks)
+│   │   ├── useChatHistory.js # AI 상담 내역 저장/불러오기 훅
+│   │   ├── useFavorites.js   # 변호사 찜하기 기능 훅
+│   │   └── useReviews.js     # 리뷰 데이터 Firebase 통신(CRUD) 훅
+│   │
+│   ├── 📁 image/             # 변호사 프로필 등 앱 내 이미지 에셋
+│   │
+│   ├── 📁 pages/             # 📺 라우터에 연결되는 각각의 화면들
+│   │   ├── MainPage.jsx      # 메인 홈페이지 (헤더, 변호사 추천, 리뷰 등)
+│   │   ├── LawyerList.jsx    # 변호사 전체 목록 및 검색/필터 화면
+│   │   ├── LawyerDetail.jsx  # 개별 변호사 상세 프로필 화면
+│   │   ├── ChatBot.jsx       # AI 법률 상담(챗봇) 화면
+│   │   ├── NewsPage.jsx      # 최신 법률 동향 및 뉴스 화면
+│   │   ├── MyPage.jsx        # 마이페이지 (찜, 리뷰, 상담기록, 비교)
+│   │   ├── LoginPage.jsx     # 로그인 화면
+│   │   └── SignupPage.jsx    # 회원가입 화면
+│   │
+│   ├── App.jsx               # 전체 라우터 설정 및 기본 레이아웃 구성
+│   ├── firebase.js           # Firebase 초기화 및 연동 설정
+│   ├── index.css             # 앱 전체에 적용되는 글로벌 스타일시트
+│   └── main.jsx              # React 애플리케이션 진입점(Entry)
+│
+├── 📄 .env                   # 환경 변수 (Firebase API Key 등 보안 정보)
+├── 📄 firebase.json          # Firebase 프로젝트 기본 설정 파일
+├── 📄 firestore.rules        # Firestore 데이터베이스 보안 접근 규칙
+├── 📄 package.json           # 설치된 라이브러리 및 앱 실행 스크립트 정보
+└── 📄 vite.config.js         # Vite 빌드 도구 설정 파일
+
